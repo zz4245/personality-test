@@ -1,1 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>æµæµä½ çéèäººæ ¼</title>
+<style>
+  :root {
+    --bg: #f5f0eb;
+    --card: #fff;
+    --text: #2c2c2c;
+    --accent: #e07b6a;
+    --accent2: #6b8f71;
+    --shadow: 0 4px 24px rgba(0,0,0,0.06);
+    --radius: 18px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Noto Sans SC", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .container {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
 
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 20px 0 8px;
+  }
+  .header .icon { font-size: 48px; margin-bottom: 8px; }
+  .header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), #d4765b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header p { font-size: 13px; color: #999; margin-top: 4px; }
+
+  /* Progress */
+  .progress-bar {
+    height: 4px;
+    background: #e0d8d0;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-bar .fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    box-shadow: var(--shadow);
+  }
+  .card .question-number {
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .card .question {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 14px 18px;
+    border: 2px solid #ece6df;
+    border-radius: 14px;
+    background: #fafaf8;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    color: var(--text);
+  }
+  .option:hover {
+    border-color: var(--accent);
+    background: #fff7f5;
+  }
+  .option.selected {
+    border-color: var(--accent);
+    background: #fff0ed;
+    font-weight: 600;
+  }
+
+  /* Result */
+  .result-page { display: none; }
+  .result-page.active { display: flex; flex-direction: column; gap: 16px; }
+  .result-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 32px 24px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .result-card .result-icon { font-size: 64px; margin-bottom: 12px; }
+  .result-card .result-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--accent);
+  }
+  .result-card .result-subtitle {
+    font-size: 13px;
+    color: #aaa;
+    margin-bottom: 16px;
+  }
+  .result-card .result-desc {
+    font-size: 14px;
+    line-height: 1.8;
+    color: #555;
+    text-align: left;
+    background: #faf9f7;
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .result-card .traits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 16px;
+  }
+  .result-card .trait {
+    background: #fff0ed;
+    color: var(--accent);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  /* Share hint */
+  .share-hint {
+    text-align: center;
+    font-size: 13px;
+    color: #999;
+    padding: 8px 0;
+  }
+  .share-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent), #d4765b);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    font-family: inherit;
+  }
+  .share-btn:hover { opacity: 0.9; }
+  .share-arrow {
+    text-align: right;
+    margin-top: 6px;
+    font-size: 18px;
+    animation: bounce 1s infinite;
+    color: var(--accent);
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .restart-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    background: #fff;
+    color: #999;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+  .restart-btn:hover { border-color: #bbb; color: #666; }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: #ccc;
+    padding: 8px 0;
+  }
+</style>
+</head>
+<body>
+<div class="container" id="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="icon">ð®</div>
+    <h1>æµæµä½ çéèäººæ ¼</h1>
+    <p>6 éé¢ Â· åç°çå®çèªå·±</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-bar">
+    <div class="fill" id="progressFill" style="width: 0%"></div>
+  </div>
+
+  <!-- Question Card -->
+  <div class="card" id="questionCard">
+    <div class="question-number" id="qNumber">QUESTION 1 / 6</div>
+    <div class="question" id="qText"></div>
+    <div class="options" id="optionsContainer"></div>
+  </div>
+
+  <!-- Result Page -->
+  <div class="result-page" id="resultPage">
+    <div class="result-card">
+      <div class="result-icon" id="resultIcon"></div>
+      <div class="result-title" id="resultTitle"></div>
+      <div class="result-subtitle" id="resultSubtitle"></div>
+      <div class="result-desc" id="resultDesc"></div>
+      <div class="traits" id="resultTraits"></div>
+    </div>
+    <button class="share-btn" onclick="window.scrollTo({top:0,behavior:'smooth'});alert('ð¸ æªå¾ä¿å­ç»æï¼åäº«å°å°çº¢ä¹¦ / æååå§ï½')">æªå¾åäº«ç»æåçç</button>
+    <button class="restart-btn" onclick="restart()">åæµä¸æ¬¡</button>
+  </div>
+
+  <div class="footer">ä»ä¾å¨±ä¹ Â· å«å¤ªå½ç</div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "å¨æ«ä¸åä½ å®å¨èªç±ï¼ææ³åä»ä¹ï¼",
+    options: [
+      { text: "ä¸ä¸ªäººçä¹¦/ççµå½±/ææ¸¸æ", score: { A: 3, B: 0, C: 1, D: 1 } },
+      { text: "çº¦ä¸äºå¥½åèä¼èå¤©", score: { A: 0, B: 3, C: 2, D: 1 } },
+      { text: "å»æ·å¤è¿å¨ææ¢ç´¢æ°å°æ¹", score: { A: 1, B: 1, C: 3, D: 0 } },
+      { text: "å­¦ä¸é¨æ°æè½æåæå·¥", score: { A: 2, B: 0, C: 0, D: 3 } }
+    ]
+  },
+  {
+    q: "é¢å¯¹ä¸ä¸ªéå¤§å³å®ï¼ä½ éå¸¸æä¹åï¼",
+    options: [
+      { text: "å·éåæå©å¼ï¼ååºæ¸å", score: { A: 3, B: 0, C: 1, D: 2 } },
+      { text: "å¬ä»åå¿çç´è§åæå", score: { A: 0, B: 3, C: 2, D: 0 } },
+      { text: "å¹¿æ³å¾æ±èº«è¾¹äººçæè§", score: { A: 1, B: 2, C: 0, D: 1 } },
+      { text: "åè¡å¨è¯éï¼è¾¹åè¾¹è°æ´", score: { A: 0, B: 0, C: 3, D: 3 } }
+    ]
+  },
+  {
+    q: "ä»¥ä¸åªç§æè¿°æç¬¦åä½ å¨å¢éä¸­çè§è²ï¼",
+    options: [
+      { text: "è¿ç­¹å¸·å¹çç­åè", score: { A: 3, B: 0, C: 2, D: 1 } },
+      { text: "é¼èå£«æ°çç²åå", score: { A: 0, B: 3, C: 1, D: 0 } },
+      { text: "å²éé·éµçæ§è¡è", score: { A: 0, B: 0, C: 3, D: 2 } },
+      { text: "è¿½æ±å®ç¾çç»èæ§", score: { A: 2, B: 0, C: 0, D: 3 } }
+    ]
+  },
+  {
+    q: "å«äººå¯¹ä½ çè¯ä»·ææ¥è¿åªä¸ªï¼",
+    options: [
+      { text: "çæ§ãé è°±ãææ·±åº¦", score: { A: 3, B: 0, C: 1, D: 1 } },
+      { text: "æ¸©æãåè¯ãæææå", score: { A: 0, B: 3, C: 0, D: 0 } },
+      { text: "æè¶£ãéæ§ãä¸æä¸æ ¼", score: { A: 1, B: 1, C: 3, D: 1 } },
+      { text: "è®¤çãè¾çãä¸ä¸ä¸è", score: { A: 1, B: 0, C: 0, D: 3 } }
+    ]
+  },
+  {
+    q: "ååå¤§çæ¶åï¼ä½ å¾åäºï¼",
+    options: [
+      { text: "ç¬èªæ¶åï¼åæé®é¢æ ¹æº", score: { A: 3, B: 0, C: 0, D: 2 } },
+      { text: "æ¾äººå¾è¯ï¼å¯»æ±æææ¯æ", score: { A: 0, B: 3, C: 1, D: 0 } },
+      { text: "è½¬ç§»æ³¨æåï¼åç©åè¯´", score: { A: 0, B: 1, C: 3, D: 0 } },
+      { text: "æ´åªåå°å¹²æ´»æ¥æ©çç¦è", score: { A: 1, B: 0, C: 0, D: 3 } }
+    ]
+  },
+  {
+    q: "ä½ å¯¹ãæåãçå®ä¹ææ¥è¿åªä¸ªï¼",
+    options: [
+      { text: "æ¥ææ·±å»çæºæ§åæ´è§", score: { A: 3, B: 0, C: 1, D: 2 } },
+      { text: "è¢«å¾å¤äººçå¿åæ¬¢åéè¦", score: { A: 0, B: 3, C: 1, D: 0 } },
+      { text: "èªç±èªå¨å°ä½éªäººç", score: { A: 1, B: 1, C: 3, D: 0 } },
+      { text: "å¨æä¸ªé¢ååå°æè´", score: { A: 1, B: 0, C: 0, D: 3 } }
+    ]
+  }
+];
+
+const results = {
+  A: {
+    icon: "ð¦",
+    title: "ãæ²æèãâ åå¨å²äººå",
+    subtitle: "ä½ çä¼¼å®éï¼åå¿å´æä¸ä¸ªæ·±éçå®å®",
+    desc: "ä½ æ¥æç½è§çæ·±åº¦æèè½åï¼ä¸æ»¡è¶³äºäºç©çè¡¨é¢ï¼æ»æ³æ¢ç©¶èåçæ¬è´¨ãä½ äº«åç¬å¤ï¼å¨ç¬å¤ä¸­è·å¾è½éåçµæãä½ çæ§ãåå¶ãèªçï¼æ¯æåç¼ä¸­ãææºæ§çäººãã\n\nð¯ ä¼å¿ï¼é»è¾æç»´å¼ºï¼åäºç³»ç»æ§å°åæé®é¢ï¼å¨å¤ææå¢ä¸­ä¿æå·éã\n\nâ ï¸ æ³¨æï¼ææ¶è¿åº¦æèä¼å¯¼è´ç¹è±«ä¸å³ï¼è®°å¾ç»èªå·±è®¾å®ãå³ç­æªæ­¢æ¶é´ãã",
+    traits: ["æ·±åº¦æè", "çæ§åå¶", "ç¬ç«", "åç"]
+  },
+  B: {
+    icon: "ð¦",
+    title: "ãå±æèãâ æ¸©ææ²»æå",
+    subtitle: "ä½ æ¯äººç¾¤ä¸­é£éä¸ç»æçæå",
+    desc: "ä½ æ¥ææäººçå±æè½åï¼è½æéå°æç¥ä»äººçæç»ªï¼å¹¶æ¬è½å°ç»äºæ¯æåå³æãä½ éè§å³ç³»ï¼ä¹äºå©äººï¼æ¯æåéå°å°é¾æ¶ç¬¬ä¸ä¸ªæ³å°çäººãä½ çå­å¨æ¬èº«å°±æ¯ä¸ç§æ²»æã\n\nð¯ ä¼å¿ï¼äººéææåº¦é«ï¼åäºå»ºç«æ·±åº¦è¿æ¥ï¼å¢éä¸­çæææ ¸å¿ã\n\nâ ï¸ æ³¨æï¼å«æææäººçæç»ªé½æå¨èªå·±è©ä¸ï¼å­¦ä¼è®¾ç«æç»ªè¾¹çï¼ç§é¡¾å¥½èªå·±ã",
+    traits: ["å±æåå¼º", "æ¸©æ", "åè§£äººæ", "å³ç³»å¯¼å"]
+  },
+  C: {
+    icon: "ð¦",
+    title: "ãæ¢é©å®¶ãâ èªç±çµé­å",
+    subtitle: "ä½ å¤©çä¸æ¿è¢«å®ä¹ï¼ä¸çæ¯ä½ æ¸¸ä¹åº",
+    desc: "ä½ æä¸é¢ä¸å®åçå¿ï¼å¯¹æ°é²äºç©åæ»¡å¥½å¥ãä½ è®¨åéå¤åæç¼ï¼åæ¬¢çµæ´»å¤åççæ´»æ¹å¼ãä½ ä¹è§ãæè¶£ãéæ§ï¼æ»è½ç»èº«è¾¹çäººå¸¦æ¥æååæ´»åãæ´»å¨å½ä¸æ¯ä½ çä¿¡æ¡ã\n\nð¯ ä¼å¿ï¼éåºåè¶å¼ºï¼åæä¸°å¯ï¼å¨ååä¸­å¦é±¼å¾æ°´ã\n\nâ ï¸ æ³¨æï¼èªç±å¾æ£ï¼ä½å¶å°ä¹éè¦éç¹åè§åï¼å«è®©éè¦çäºæå¨éæ§ä¸­æºèµ°ã",
+    traits: ["å¥½å¥å¿", "ä¹è§éæ§", "éåºåå¼º", "åæ"]
+  },
+  D: {
+    icon: "ð",
+    title: "ãå·¥å ãâ æè´æ§è¡å",
+    subtitle: "ä½ ç¨è¡å¨è¯´è¯ï¼ç¨ç»æè¯æä¸å",
+    desc: "ä½ æ¯ä¸ä¸ªä¸æä¸æ£çè¡å¨æ´¾åå®ç¾ä¸»ä¹èãä¸æ¦ç¡®ç«äºç®æ ï¼ä½ ä¼å¨ææå¥ï¼è¿½æ±æ¯ä¸ä¸ªç»èçæè´ãä½ å¤å¥ãèªå¾ãå¯é ï¼æ¯é£ç§ãæäºäº¤ç»ä½ å°±æ¾å¿ãçäººã\n\nð¯ ä¼å¿ï¼æ§è¡åæå¼ºï¼é«æ åé«äº§åºï¼å¨ä¸ä¸é¢åå®¹ææä¸ºä¸å®¶ã\n\nâ ï¸ æ³¨æï¼å®ç¾æ¯å¾å¥½çè¿½æ±ï¼ä½å«è®©å®æä¸ºå¼å§çéç¢ã80 åå°±åºåï¼è·¯ä¸åä¼åã",
+    traits: ["æ§è¡åå¼º", "è¿½æ±å®ç¾", "èªå¾", "å¯é "]
+  }
+};
+
+let currentQ = 0;
+let scores = { A: 0, B: 0, C: 0, D: 0 };
+let selectedOption = null;
+
+function renderQuestion() {
+  if (currentQ >= questions.length) return showResult();
+  const q = questions[currentQ];
+  selectedOption = null;
+  document.getElementById('qNumber').textContent = `QUESTION ${currentQ + 1} / ${questions.length}`;
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('progressFill').style.width = ((currentQ / questions.length) * 100) + '%';
+
+  const container = document.getElementById('optionsContainer');
+  container.innerHTML = q.options.map((opt, i) =>
+    `<button class="option" data-index="${i}" onclick="selectOption(${i}, this)">${opt.text}</button>`
+  ).join('');
+}
+
+function selectOption(index, el) {
+  if (selectedOption !== null) return;
+  selectedOption = index;
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+
+  const q = questions[currentQ];
+  const chosen = q.options[index];
+  for (const [k, v] of Object.entries(chosen.score)) {
+    scores[k] += v;
+  }
+
+  setTimeout(() => {
+    currentQ++;
+    if (currentQ < questions.length) {
+      document.getElementById('progressFill').style.width = ((currentQ / questions.length) * 100) + '%';
+      renderQuestion();
+    } else {
+      document.getElementById('progressFill').style.width = '100%';
+      showResult();
+    }
+  }, 350);
+}
+
+function showResult() {
+  document.getElementById('questionCard').style.display = 'none';
+  document.getElementById('resultPage').classList.add('active');
+
+  let maxType = 'A';
+  let maxScore = 0;
+  for (const [k, v] of Object.entries(scores)) {
+    if (v > maxScore) { maxScore = v; maxType = k; }
+  }
+  const r = results[maxType];
+  document.getElementById('resultIcon').textContent = r.icon;
+  document.getElementById('resultTitle').textContent = r.title;
+  document.getElementById('resultSubtitle').textContent = r.subtitle;
+  document.getElementById('resultDesc').textContent = r.desc;
+  document.getElementById('resultTraits').innerHTML = r.traits.map(t => `<span class="trait">${t}</span>`).join('');
+}
+
+function restart() {
+  currentQ = 0;
+  scores = { A: 0, B: 0, C: 0, D: 0 };
+  selectedOption = null;
+  document.getElementById('questionCard').style.display = '';
+  document.getElementById('resultPage').classList.remove('active');
+  document.getElementById('progressFill').style.width = '0%';
+  renderQuestion();
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
